@@ -9,7 +9,7 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: "https://teamahall.netlify.app/",
+    origin: "https://teamahall.netlify.app",
     credentials: true,
   })
 );
