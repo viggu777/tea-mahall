@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     proxy: {
-      "/api": "http:teamahall.netlify.app", // proxy only /api to backend
+      "/api": "https://teamahall.netlify.app", // proxy only /api to backend
     },
   },
 });
