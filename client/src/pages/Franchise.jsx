@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import API from "../api";
 import { motion } from "framer-motion";
 import {
   CheckCircle,
@@ -17,6 +18,7 @@ import {
   Heart,
   Shield,
   Zap,
+  AlertCircle,
 } from "lucide-react";
 
 const Franchise = () => {
@@ -29,28 +31,84 @@ const Franchise = () => {
   });
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setSuccess(false);
+  const validateForm = () => {
+    // Reset error
+    setError("");
+
+    // Basic validation
+    if (!formData.name.trim()) {
+      setError("Name is required");
+      return false;
+    }
+
+    if (!formData.email.trim()) {
+      setError("Email is required");
+      return false;
+    }
+
+    // Email validation
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(formData.email)) {
+      setError("Please enter a valid email address");
+      return false;
+    }
+
+    if (!formData.phone.trim()) {
+      setError("Phone number is required");
+      return false;
+    }
 
     // Phone number validation
     const phonePattern = /^[6-9]\d{9}$/;
     if (!phonePattern.test(formData.phone)) {
-      alert("Please enter a valid 10-digit Indian phone number.");
-      setLoading(false);
+      setError("Please enter a valid 10-digit Indian phone number");
+      return false;
+    }
+
+    if (!formData.location.trim()) {
+      setError("Location is required");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
       return;
     }
 
-    try {
-      // Simulated API call for demo
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+    setLoading(true);
+    setSuccess(false);
+    setError("");
 
-      setSuccess(true);
+    try {
+      console.log("Submitting form data:", formData);
+
+      const res = await API.post("/api/franchise", formData);
+
+      console.log("API Response:", res.data);
+
+      if (res.data.success === false) {
+        throw new Error(res.data.message || "Submission failed");
+      }
+
+      if (res.data.emailIssue) {
+        setError(
+          "Your request was saved, but we couldn't send a confirmation email. Please double-check your email."
+        );
+      } else {
+        setSuccess(true);
+      }
+
+      // Reset form on success
       setFormData({
         name: "",
         email: "",
@@ -60,7 +118,24 @@ const Franchise = () => {
       });
     } catch (error) {
       console.error("Submission error:", error);
-      alert("Something went wrong. Please try again.");
+
+      // Handle different types of errors
+      if (error?.response?.status === 500) {
+        setError(
+          "Server error occurred. Please try again later or contact support."
+        );
+      } else if (error?.response?.status === 400) {
+        setError(
+          error?.response?.data?.message ||
+            "Invalid form data. Please check your inputs."
+        );
+      } else if (error?.response?.data?.message) {
+        setError(error.response.data.message);
+      } else if (error?.message) {
+        setError(error.message);
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -385,7 +460,7 @@ const Franchise = () => {
           </div>
 
           <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12">
-            <div className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
@@ -474,6 +549,17 @@ const Franchise = () => {
                 />
               </div>
 
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-red-100 border border-red-400 rounded-xl p-4 flex items-center space-x-2"
+                >
+                  <AlertCircle className="w-5 h-5 text-red-600" />
+                  <p className="text-red-800">{error}</p>
+                </motion.div>
+              )}
+
               <button
                 type="submit"
                 disabled={loading}
@@ -508,7 +594,7 @@ const Franchise = () => {
                   </p>
                 </motion.div>
               )}
-            </div>
+            </form>
           </div>
         </div>
       </motion.section>
