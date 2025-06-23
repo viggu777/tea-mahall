@@ -48,11 +48,29 @@ router.post("/", async (req, res) => {
         to: email,
         subject: "Franchise Request Received ✔️",
         html: `
-          <h2>Hello ${name},</h2>
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #2d5a27;">Hello ${name},</h2>
           <p>Thank you for showing interest in becoming a <strong>Tea Mahal</strong> franchise partner.</p>
-          <p>We’ve received your request and our team will reach out to you soon.</p>
+          <p>We've received your request and our team will reach out to you within 24 hours.</p>
+          
+          <div style="background-color: #f0f8ff; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="color: #2d5a27; margin-top: 0;">Your Submitted Details:</h3>
+            <p><strong>Name:</strong> ${name}</p>
+            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Phone:</strong> ${phone}</p>
+            <p><strong>Preferred Location:</strong> ${location}</p>
+            ${message ? `<p><strong>Message:</strong> ${message}</p>` : ""}
+          </div>
+          
+          <p>If you have any immediate questions, feel free to reach out to us at:</p>
+          <ul>
+            <li>📞 Phone: +91 7013415191</li>
+            <li>📧 Email: franchise@teamahal.com</li>
+          </ul>
+          
           <br/>
-          <p>Best regards,<br/>Tea Mahal Team ☕</p>
+          <p style="color: #2d5a27;">Best regards,<br/>Tea Mahal Team ☕</p>
+        </div>
         `,
       });
     } catch (err) {
