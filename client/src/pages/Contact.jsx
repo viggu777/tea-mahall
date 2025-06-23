@@ -1,6 +1,15 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, Phone, MapPin, Clock, Heart, Leaf } from "lucide-react";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Clock,
+  Heart,
+  Leaf,
+  AlertCircle,
+} from "lucide-react";
+import API from "../api"; // Import your API instance
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -12,26 +21,85 @@ const Contact = () => {
   });
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setSuccess(false);
+  const validateForm = () => {
+    // Reset error
+    setError("");
 
+    // Basic validation
+    if (!formData.name.trim()) {
+      setError("Name is required");
+      return false;
+    }
+
+    if (!formData.email.trim()) {
+      setError("Email is required");
+      return false;
+    }
+
+    // Email validation
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(formData.email)) {
+      setError("Please enter a valid email address");
+      return false;
+    }
+
+    if (!formData.phone.trim()) {
+      setError("Phone number is required");
+      return false;
+    }
+
+    // Phone number validation
     const phonePattern = /^[6-9]\d{9}$/;
     if (!phonePattern.test(formData.phone)) {
-      alert("Please enter a valid 10-digit Indian phone number.");
-      setLoading(false);
+      setError("Please enter a valid 10-digit Indian phone number");
+      return false;
+    }
+
+    if (!formData.location.trim()) {
+      setError("Location is required");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
       return;
     }
 
+    setLoading(true);
+    setSuccess(false);
+    setError("");
+
     try {
-      // Simulating API call for demo
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setSuccess(true);
+      console.log("Submitting contact form data:", formData);
+
+      // Use the same API endpoint as franchise or create a new one for contact
+      const res = await API.post("/api/franchise", formData);
+
+      console.log("API Response:", res.data);
+
+      if (res.data.success === false) {
+        throw new Error(res.data.message || "Submission failed");
+      }
+
+      if (res.data.emailIssue) {
+        setError(
+          "Your message was saved, but we couldn't send a confirmation email. Please double-check your email."
+        );
+      } else {
+        setSuccess(true);
+      }
+
+      // Reset form on success
       setFormData({
         name: "",
         email: "",
@@ -41,7 +109,24 @@ const Contact = () => {
       });
     } catch (error) {
       console.error("Submission error:", error);
-      alert("Something went wrong. Try again later.");
+
+      // Handle different types of errors
+      if (error?.response?.status === 500) {
+        setError(
+          "Server error occurred. Please try again later or contact support."
+        );
+      } else if (error?.response?.status === 400) {
+        setError(
+          error?.response?.data?.message ||
+            "Invalid form data. Please check your inputs."
+        );
+      } else if (error?.response?.data?.message) {
+        setError(error.response.data.message);
+      } else if (error?.message) {
+        setError(error.message);
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -129,7 +214,7 @@ const Contact = () => {
                     <Phone className="text-green-600 w-5 h-5 flex-shrink-0" />
                     <div>
                       <span className="font-semibold text-gray-800">
-                        +91 98765 43210
+                        +91 7013415191
                       </span>
                       <p className="text-sm text-gray-600">
                         Call us for a warm conversation
@@ -206,7 +291,7 @@ const Contact = () => {
               </div>
             </motion.div>
 
-            {/* Right: Franchise Form */}
+            {/* Right: Contact Form */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -227,7 +312,7 @@ const Contact = () => {
                   </p>
                 </div>
 
-                <div className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="relative">
                     <input
                       type="text"
@@ -294,13 +379,27 @@ const Contact = () => {
                     ></textarea>
                   </div>
 
+                  {error && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-red-100 border border-red-400 rounded-2xl p-4 flex items-center space-x-2"
+                    >
+                      <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                      <p className="text-red-800">{error}</p>
+                    </motion.div>
+                  )}
+
                   <motion.button
-                    type="button"
-                    onClick={handleSubmit}
+                    type="submit"
                     disabled={loading}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white py-4 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 disabled:opacity-70"
+                    whileHover={{ scale: loading ? 1 : 1.02 }}
+                    whileTap={{ scale: loading ? 1 : 0.98 }}
+                    className={`w-full py-4 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 ${
+                      loading
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600"
+                    } text-white`}
                   >
                     {loading ? (
                       <div className="flex items-center justify-center gap-2">
@@ -331,7 +430,7 @@ const Contact = () => {
                       </p>
                     </motion.div>
                   )}
-                </div>
+                </form>
               </div>
             </motion.div>
           </div>
@@ -363,6 +462,10 @@ const Contact = () => {
         </div>
       </motion.section>
     </div>
+  );
+};
+
+export default Contact;
   );
 };
 
