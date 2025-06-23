@@ -73,7 +73,7 @@ const Footer = () => {
                     <p className="text-amber-100 text-sm leading-relaxed">
                       Tea Mahall Headquarters
                       <br />
-                      12-34, Main Road, Srikakulam
+                      12-34, Main Road, Rajahumendry
                       <br />
                       Andhra Pradesh, India – 532001
                     </p>
