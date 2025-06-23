@@ -214,7 +214,7 @@ const Contact = () => {
                     <Phone className="text-green-600 w-5 h-5 flex-shrink-0" />
                     <div>
                       <span className="font-semibold text-gray-800">
-                        +91 98765 43210
+                        +91 70134 15191
                       </span>
                       <p className="text-sm text-gray-600">
                         Call us for a warm conversation
