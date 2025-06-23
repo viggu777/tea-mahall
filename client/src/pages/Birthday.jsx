@@ -13,21 +13,16 @@ const FounderPhotoSlideshow = () => {
     },
     {
       id: 2,
-      title: "Tea Master",
-      description: "Crafting the perfect blend",
-    },
-    {
-      id: 3,
       title: "Business Pioneer",
       description: "Building dreams into reality",
     },
     {
-      id: 4,
+      id: 3,
       title: "Community Builder",
       description: "Bringing people together",
     },
     {
-      id: 5,
+      id: 4,
       title: "Celebrating Success",
       description: "Moments of achievement and joy",
     },
@@ -55,19 +50,13 @@ const FounderPhotoSlideshow = () => {
                     : "opacity-0 scale-110 rotate-3"
                 }`}
               >
-                {/* Replace with actual founder photos */}
-                <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center text-white">
-                  <div className="text-center">
-                    <div className="text-6xl mb-4">👤</div>
-                    <div className="text-sm font-bold">{photo.title}</div>
-                  </div>
-                </div>
+                
                 {/* Replace above div with: */}
-                {/* <img 
-                  src={`/path/to/founder-photo-${photo.id}.jpg`} 
+                <img 
+                  src={`/pic-${photo.id}.jpeg`} 
                   alt={photo.title}
                   className="w-full h-full object-cover"
-                /> */}
+                />
               </div>
             ))}
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
