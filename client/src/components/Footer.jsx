@@ -75,7 +75,7 @@ const Footer = () => {
                       <br />
                       12-34, Main Road, Rajahumendry
                       <br />
-                      Andhra Pradesh, India – 532001
+                      Andhra Pradesh, India – 533101
                     </p>
                   </div>
                 </div>
@@ -93,10 +93,10 @@ const Footer = () => {
                 <div className="flex items-center space-x-3 group">
                   <FaPhone className="text-yellow-400 group-hover:scale-110 transition-transform" />
                   <a
-                    href="tel:+919876543210"
+                    href="tel:+917013415191"
                     className="text-green-300 hover:text-green-200 text-sm hover:underline transition-colors"
                   >
-                    +91 98765 43210
+                    +91 70134 15191
                   </a>
                 </div>
               </div>
