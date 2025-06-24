@@ -3,13 +3,13 @@ import API from "../api";
 
 const Menu = () => {
   const [items, setItems] = useState([]);
- const [form, setForm] = useState({
-  name: "",
-  description: "",
-  price: "",
-  category: "Tea", // Default
-  image: null,
-});
+  const [form, setForm] = useState({
+    name: "",
+    description: "",
+    price: "",
+    category: "Tea", // Default
+    image: null,
+  });
 
   const [editId, setEditId] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -20,7 +20,7 @@ const Menu = () => {
   const token = localStorage.getItem("token");
   const isAdmin = !!token;
 
-  const categories = ["all", "hot tea", "iced tea", "specialty", "snacks"];
+  const categories = ["all", "Tea", "Healthy Tea", "Coolers", "Juices", "Snacks"];
 
   const fetchMenu = async () => {
     setLoading(true);
@@ -61,14 +61,16 @@ const Menu = () => {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  setForm({
-  name: item.name,
-  description: item.description,
-  price: item.price,
-  image: null,
-  category: item.category || "Tea", // fallback
-});
-
+  // Fixed handleEdit function
+  const handleEdit = (item) => {
+    setEditId(item._id);
+    setForm({
+      name: item.name,
+      description: item.description,
+      price: item.price,
+      image: null,
+      category: item.category || "Tea", // fallback
+    });
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -97,7 +99,7 @@ const Menu = () => {
         alert("Item added successfully!");
       }
       setEditId(null);
-      setForm({ name: "", description: "", price: "", image: null });
+      setForm({ name: "", description: "", price: "", category: "Tea", image: null });
       setShowForm(false);
       fetchMenu();
     } catch (err) {
@@ -107,12 +109,25 @@ const Menu = () => {
     }
   };
 
+  // Filter items based on search and category
   const filteredItems = items.filter((item) => {
     const matchesSearch =
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.description.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesSearch;
+    const matchesCategory =
+      selectedCategory === "all" || item.category === selectedCategory;
+    return matchesSearch && matchesCategory;
   });
+
+  // Group items by category
+  const groupedItems = filteredItems.reduce((acc, item) => {
+    const category = item.category || "Other";
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(item);
+    return acc;
+  }, {});
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-amber-50">
@@ -133,6 +148,45 @@ const Menu = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* Search and Filter Controls */}
+        <div className="mb-8">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+            <div className="flex flex-col md:flex-row gap-4">
+              {/* Search Input */}
+              <div className="flex-1">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Search Menu
+                </label>
+                <input
+                  type="text"
+                  placeholder="Search by name or description..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 bg-gray-50 focus:bg-white"
+                />
+              </div>
+              
+              {/* Category Filter */}
+              <div className="md:w-64">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Filter by Category
+                </label>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300"
+                >
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category === "all" ? "All Categories" : category}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Admin Controls */}
         {isAdmin && (
           <div className="mb-12">
@@ -179,23 +233,23 @@ const Menu = () => {
                       />
                     </div>
                     <div className="space-y-2">
-  <label className="block text-sm font-semibold text-gray-700">
-    Category
-  </label>
-  <select
-    name="category"
-    value={form.category}
-    onChange={handleChange}
-    required
-    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300"
-  >
-    <option value="Tea">Tea</option>
-    <option value="Healthy Tea">Healthy Tea</option>
-    <option value="Coolers">Coolers</option>
-    <option value="Juices">Juices</option>
-    <option value="Snacks">Snacks</option>
-  </select>
-</div>
+                      <label className="block text-sm font-semibold text-gray-700">
+                        Category
+                      </label>
+                      <select
+                        name="category"
+                        value={form.category}
+                        onChange={handleChange}
+                        required
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300"
+                      >
+                        <option value="Tea">Tea</option>
+                        <option value="Healthy Tea">Healthy Tea</option>
+                        <option value="Coolers">Coolers</option>
+                        <option value="Juices">Juices</option>
+                        <option value="Snacks">Snacks</option>
+                      </select>
+                    </div>
 
                     <div className="space-y-2">
                       <label className="block text-sm font-semibold text-gray-700">
@@ -212,7 +266,6 @@ const Menu = () => {
                       />
                     </div>
                   </div>
-                  
 
                   <div className="space-y-2">
                     <label className="block text-sm font-semibold text-gray-700">
@@ -264,6 +317,7 @@ const Menu = () => {
                             name: "",
                             description: "",
                             price: "",
+                            category: "Tea",
                             image: null,
                           });
                           setShowForm(false);
@@ -280,60 +334,87 @@ const Menu = () => {
           </div>
         )}
 
-        {/* Menu Items Grid */}
+        {/* Menu Items by Category */}
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
             <span className="ml-4 text-gray-600">Loading menu...</span>
           </div>
         ) : (
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filteredItems.map((item) => (
-              <div
-                key={item._id}
-                className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 transform hover:-translate-y-2"
-              >
-                {/* Image Container */}
-                <div className="relative h-56 overflow-hidden">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div className="absolute top-4 right-4 bg-emerald-600 text-white px-3 py-1 rounded-full text-sm font-bold">
-                    ₹{item.price}
+          <div className="space-y-12">
+            {Object.entries(groupedItems).map(([category, categoryItems]) => (
+              <div key={category} className="category-section">
+                {/* Category Header */}
+                <div className="mb-8">
+                  <div className="flex items-center space-x-4">
+                    <div className="h-1 bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-full flex-1 max-w-20"></div>
+                    <h2 className="text-3xl font-bold text-gray-800 px-4">
+                      {category}
+                    </h2>
+                    <div className="h-1 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full flex-1 max-w-20"></div>
+                  </div>
+                  <div className="text-center mt-2">
+                    <span className="text-emerald-600 font-medium">
+                      {categoryItems.length} item{categoryItems.length !== 1 ? 's' : ''}
+                    </span>
                   </div>
                 </div>
 
-                {/* Content */}
-                <div className="p-6 space-y-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 group-hover:text-emerald-600 transition-colors duration-300">
-                      {item.name}
-                    </h3>
-                    <p className="text-gray-600 text-sm mt-2 leading-relaxed line-clamp-2">
-                      {item.description}
-                    </p>
-                  </div>
+                {/* Category Items Grid */}
+                <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {categoryItems.map((item) => (
+                    <div
+                      key={item._id}
+                      className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 transform hover:-translate-y-2"
+                    >
+                      {/* Image Container */}
+                      <div className="relative h-56 overflow-hidden">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="absolute top-4 right-4 bg-emerald-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                          ₹{item.price}
+                        </div>
+                        {/* Category Badge */}
+                        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-emerald-700 px-2 py-1 rounded-full text-xs font-medium">
+                          {item.category}
+                        </div>
+                      </div>
 
-                  {/* Admin Buttons Below Content */}
-                  {isAdmin && (
-                    <div className="flex justify-between pt-4 border-t border-gray-100">
-                      <button
-                        onClick={() => handleEdit(item)}
-                        className="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg font-medium text-sm hover:bg-blue-100 transition-colors duration-300"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item._id)}
-                        className="px-4 py-2 bg-red-50 text-red-600 rounded-lg font-medium text-sm hover:bg-red-100 transition-colors duration-300"
-                      >
-                        Delete
-                      </button>
+                      {/* Content */}
+                      <div className="p-6 space-y-4">
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900 group-hover:text-emerald-600 transition-colors duration-300">
+                            {item.name}
+                          </h3>
+                          <p className="text-gray-600 text-sm mt-2 leading-relaxed line-clamp-2">
+                            {item.description}
+                          </p>
+                        </div>
+
+                        {/* Admin Buttons Below Content */}
+                        {isAdmin && (
+                          <div className="flex justify-between pt-4 border-t border-gray-100">
+                            <button
+                              onClick={() => handleEdit(item)}
+                              className="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg font-medium text-sm hover:bg-blue-100 transition-colors duration-300"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDelete(item._id)}
+                              className="px-4 py-2 bg-red-50 text-red-600 rounded-lg font-medium text-sm hover:bg-red-100 transition-colors duration-300"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  )}
+                  ))}
                 </div>
               </div>
             ))}
