@@ -14,27 +14,23 @@ router.get(
   })
 );
 
-// ✅ POST: Add menu item (admin only)
+// POST: Add menu item
 router.post(
   "/",
   authenticateAdmin,
   upload.single("image"),
   wrapAsync(async (req, res) => {
-    console.log("Headers:", req.headers);
-    console.log("Admin:", req.admin);
-
-    const { name, description, price } = req.body;
+    const { name, description, price, category } = req.body;
     const image = req.file?.path;
-
     if (!image) return res.status(400).json({ error: "Image upload failed" });
 
-    const item = new MenuItem({ name, description, price, image });
+    const item = new MenuItem({ name, description, price, image, category });
     const savedItem = await item.save();
     res.status(201).json(savedItem);
   })
 );
 
-// ✅ PUT: Update menu item
+// PUT: Update menu item
 router.put(
   "/:id",
   authenticateAdmin,
@@ -44,8 +40,8 @@ router.put(
       name: req.body.name,
       description: req.body.description,
       price: req.body.price,
+      category: req.body.category,
     };
-
     if (req.file?.path) updateData.image = req.file.path;
 
     const updatedItem = await MenuItem.findByIdAndUpdate(
@@ -59,6 +55,7 @@ router.put(
     res.json(updatedItem);
   })
 );
+
 
 // ✅ DELETE: Remove menu item
 router.delete(
