@@ -7,22 +7,11 @@ import Franchise from "./pages/Franchise";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
 import AdminLogin from "./pages/AdminLogin";
-import Birthday from "./pages/Birthday";
 
 function App() {
   return (
     <Router>
-      <div className="flex flex-col min-h-screen">
-        <Routes>
-          {/* Birthday page without navbar/footer */}
-          <Route path="/birthday" element={<Birthday />} />
-
-          {/* All other pages with navbar/footer */}
-          <Route
-            path="/*"
-            element={
-              <>
-                <Navbar />
+           <Navbar />
                 <div className="flex-grow">
                   <Routes>
                     <Route path="/" element={<Home />} />
@@ -34,11 +23,6 @@ function App() {
                   </Routes>
                 </div>
                 <Footer />
-              </>
-            }
-          />
-        </Routes>
-      </div>
     </Router>
   );
 }
