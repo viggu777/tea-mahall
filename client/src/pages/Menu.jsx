@@ -14,8 +14,7 @@ const Menu = () => {
   const [editId, setEditId] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
+
 
   const token = localStorage.getItem("token");
   const isAdmin = !!token;
@@ -109,18 +108,8 @@ const Menu = () => {
     }
   };
 
-  // Filter items based on search and category
-  const filteredItems = items.filter((item) => {
-    const matchesSearch =
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "all" || item.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
-
-  // Group items by category
-  const groupedItems = filteredItems.reduce((acc, item) => {
+  // Group items by category (only show categories that have items)
+  const groupedItems = items.reduce((acc, item) => {
     const category = item.category || "Other";
     if (!acc[category]) {
       acc[category] = [];
@@ -148,44 +137,7 @@ const Menu = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* Search and Filter Controls */}
-        <div className="mb-8">
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              {/* Search Input */}
-              <div className="flex-1">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Search Menu
-                </label>
-                <input
-                  type="text"
-                  placeholder="Search by name or description..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 bg-gray-50 focus:bg-white"
-                />
-              </div>
-              
-              {/* Category Filter */}
-              <div className="md:w-64">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Filter by Category
-                </label>
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300"
-                >
-                  {categories.map((category) => (
-                    <option key={category} value={category}>
-                      {category === "all" ? "All Categories" : category}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
+
 
         {/* Admin Controls */}
         {isAdmin && (
@@ -421,14 +373,14 @@ const Menu = () => {
           </div>
         )}
 
-        {filteredItems.length === 0 && !loading && (
+        {Object.keys(groupedItems).length === 0 && !loading && (
           <div className="text-center py-20">
             <div className="text-6xl mb-4">🫖</div>
             <h3 className="text-2xl font-bold text-gray-700 mb-2">
               No items found
             </h3>
             <p className="text-gray-500">
-              Try adjusting your search or filter criteria.
+              No menu items available. Add some items to get started!
             </p>
           </div>
         )}
