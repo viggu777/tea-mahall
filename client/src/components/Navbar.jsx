@@ -5,23 +5,72 @@ import { Menu, X, LogOut } from "lucide-react";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  // Mock router functions for demo - replace with your actual router
-  const Link = ({ to, children, className, onClick }) => (
-    <a href={to} className={className} onClick={onClick}>
-      {children}
-    </a>
-  );
-
-  const useNavigate = () => (path) => console.log(`Navigate to ${path}`);
-  const useLocation = () => ({ pathname: window.location.pathname || "/" });
-
+  
   const navigate = useNavigate();
   const location = useLocation();
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
-  // 🔁 Re-check login status on route change
+  // Clear tokens on page load/reload or when site is closed
   useEffect(() => {
+    const handleBeforeUnload = () => {
+      // Clear all tokens when page is being unloaded (closed/refreshed)
+      clearAllTokens();
+    };
+
+    const handlePageShow = (event) => {
+      // Clear tokens when page is shown (including back/forward navigation)
+      if (event.persisted) {
+        clearAllTokens();
+        setIsAdmin(false);
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      // Clear tokens when tab becomes hidden (user switches tabs or minimizes)
+      if (document.hidden) {
+        clearAllTokens();
+        setIsAdmin(false);
+      }
+    };
+
+    // Add event listeners
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('pageshow', handlePageShow);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Cleanup event listeners
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('pageshow', handlePageShow);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  // Check login status on component mount and route changes
+  useEffect(() => {
+    checkAdminStatus();
+  }, [location.pathname]);
+
+  const clearAllTokens = () => {
+    // Clear all possible token locations
+    if (typeof Storage !== 'undefined') {
+      if (localStorage?.removeItem) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("admin_token");
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("access_token");
+      }
+      if (sessionStorage?.removeItem) {
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("admin_token");
+        sessionStorage.removeItem("authToken");
+        sessionStorage.removeItem("access_token");
+      }
+    }
+  };
+
+  const checkAdminStatus = () => {
     // Check both localStorage and sessionStorage for various token names
     const tokenChecks = [
       localStorage?.getItem?.("token"),
@@ -52,24 +101,23 @@ const Navbar = () => {
     console.log("Found token:", token ? "YES" : "NO");
     console.log("isAdmin set to:", !!token);
     console.log("========================");
-  }, [isAdmin]); // updates when path changes
+  };
 
   const handleLogout = () => {
-    // Clear all possible token locations
-    if (localStorage?.removeItem) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("admin_token");
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("access_token");
-    }
-    if (sessionStorage?.removeItem) {
-      sessionStorage.removeItem("token");
-      sessionStorage.removeItem("admin_token");
-      sessionStorage.removeItem("authToken");
-      sessionStorage.removeItem("access_token");
-    }
+    // Clear all tokens
+    clearAllTokens();
     setIsAdmin(false);
-    navigate("/"); // ✅ or redirect to login if preferred
+    
+    // Close mobile menu if open
+    setIsOpen(false);
+    
+    // Navigate to home page
+    navigate("/");
+    
+    // Force reload the page to ensure all components update
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
   };
 
   const isActiveRoute = (path) => {
@@ -270,10 +318,7 @@ const Navbar = () => {
 
               {isAdmin && (
                 <button
-                  onClick={() => {
-                    handleLogout();
-                    toggleMenu();
-                  }}
+                  onClick={handleLogout}
                   className="w-full p-3 mt-4 text-red-600 bg-red-50 border border-red-200 rounded-xl font-semibold transition-all duration-300 hover:bg-red-100 hover:border-red-300 group active:scale-98"
                 >
                   <div className="flex items-center justify-center gap-2">
@@ -308,5 +353,7 @@ const Navbar = () => {
     </nav>
   );
 };
+
+export default Navbar;
 
 export default Navbar;
