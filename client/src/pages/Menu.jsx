@@ -3,12 +3,14 @@ import API from "../api";
 
 const Menu = () => {
   const [items, setItems] = useState([]);
-  const [form, setForm] = useState({
-    name: "",
-    description: "",
-    price: "",
-    image: null,
-  });
+ const [form, setForm] = useState({
+  name: "",
+  description: "",
+  price: "",
+  category: "Tea", // Default
+  image: null,
+});
+
   const [editId, setEditId] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -59,14 +61,14 @@ const Menu = () => {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleEdit = (item) => {
-    setEditId(item._id);
-    setForm({
-      name: item.name,
-      description: item.description,
-      price: item.price,
-      image: null,
-    });
+  setForm({
+  name: item.name,
+  description: item.description,
+  price: item.price,
+  image: null,
+  category: item.category || "Tea", // fallback
+});
+
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -177,6 +179,25 @@ const Menu = () => {
                       />
                     </div>
                     <div className="space-y-2">
+  <label className="block text-sm font-semibold text-gray-700">
+    Category
+  </label>
+  <select
+    name="category"
+    value={form.category}
+    onChange={handleChange}
+    required
+    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300"
+  >
+    <option value="Tea">Tea</option>
+    <option value="Healthy Tea">Healthy Tea</option>
+    <option value="Coolers">Coolers</option>
+    <option value="Juices">Juices</option>
+    <option value="Snacks">Snacks</option>
+  </select>
+</div>
+
+                    <div className="space-y-2">
                       <label className="block text-sm font-semibold text-gray-700">
                         Price (₹)
                       </label>
@@ -191,6 +212,7 @@ const Menu = () => {
                       />
                     </div>
                   </div>
+                  
 
                   <div className="space-y-2">
                     <label className="block text-sm font-semibold text-gray-700">
