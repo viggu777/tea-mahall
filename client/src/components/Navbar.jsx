@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Menu, X, LogOut } from "lucide-react";
 
 const Navbar = () => {
@@ -8,30 +8,48 @@ const Navbar = () => {
   
   const navigate = useNavigate();
   const location = useLocation();
+  const logoutTimerRef = useRef(null);
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
-  // Clear tokens on page load/reload or when site is closed
+  // Handle page visibility changes and beforeunload
   useEffect(() => {
     const handleBeforeUnload = () => {
-      // Clear all tokens when page is being unloaded (closed/refreshed)
-      clearAllTokens();
-    };
-
-    const handlePageShow = (event) => {
-      // Clear tokens when page is shown (including back/forward navigation)
-      if (event.persisted) {
+      // Set a timer to logout after 1 minute when user leaves the site
+      // This will only work if the user actually closes the tab/browser
+      // For tab switching, we'll handle it in visibility change
+      logoutTimerRef.current = setTimeout(() => {
         clearAllTokens();
         setIsAdmin(false);
-      }
+      }, 60000); // 1 minute delay
     };
 
     const handleVisibilityChange = () => {
-      // Clear tokens when tab becomes hidden (user switches tabs or minimizes)
       if (document.hidden) {
-        clearAllTokens();
-        setIsAdmin(false);
+        // User switched tabs or minimized window - start logout timer
+        logoutTimerRef.current = setTimeout(() => {
+          clearAllTokens();
+          setIsAdmin(false);
+        }, 60000); // 1 minute delay
+      } else {
+        // User came back to the tab - cancel logout timer
+        if (logoutTimerRef.current) {
+          clearTimeout(logoutTimerRef.current);
+          logoutTimerRef.current = null;
+        }
+        // Re-check admin status when user returns
+        checkAdminStatus();
       }
+    };
+
+    const handlePageShow = (event) => {
+      // Cancel any pending logout when page is shown
+      if (logoutTimerRef.current) {
+        clearTimeout(logoutTimerRef.current);
+        logoutTimerRef.current = null;
+      }
+      // Re-check admin status
+      checkAdminStatus();
     };
 
     // Add event listeners
@@ -39,11 +57,17 @@ const Navbar = () => {
     window.addEventListener('pageshow', handlePageShow);
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    // Cleanup event listeners
+    // Cleanup event listeners and timer
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       window.removeEventListener('pageshow', handlePageShow);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      
+      // Clear any pending logout timer
+      if (logoutTimerRef.current) {
+        clearTimeout(logoutTimerRef.current);
+        logoutTimerRef.current = null;
+      }
     };
   }, []);
 
@@ -104,6 +128,12 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
+    // Clear any pending logout timer
+    if (logoutTimerRef.current) {
+      clearTimeout(logoutTimerRef.current);
+      logoutTimerRef.current = null;
+    }
+    
     // Clear all tokens
     clearAllTokens();
     setIsAdmin(false);
