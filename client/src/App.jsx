@@ -7,24 +7,34 @@ import Franchise from "./pages/Franchise";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
 import AdminLogin from "./pages/AdminLogin";
+import AlreadyLoggedInRoute from "./components/AlreadyLoggedInRoute";
 
 function App() {
   return (
     <Router>
-           <Navbar />
-                <div className="flex-grow">
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/menu" element={<Menu />} />
-                    <Route path="/About" element={<About />} />
-                    <Route path="/franchise" element={<Franchise />} />
-                    <Route path="/Contact" element={<Contact />} />
-                    <Route path="/admin/login" element={<AdminLogin />} />
-                  </Routes>
-                </div>
-                <Footer />
+      <Navbar />
+      <div className="flex-grow">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/menu" element={<Menu />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/franchise" element={<Franchise />} />
+          <Route path="/contact" element={<Contact />} />
+          
+          <Route
+            path="/admin/login"
+            element={
+              <AlreadyLoggedInRoute>
+                <AdminLogin />
+              </AlreadyLoggedInRoute>
+            }
+          />
+        </Routes>
+      </div>
+      <Footer />
     </Router>
   );
 }
 
 export default App;
+
