@@ -6,7 +6,7 @@ import { useUser, useClerk } from "@clerk/clerk-react";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-<<<<<<< HEAD
+
   const logoutTimerRef = useRef(null);
 
   const toggleMenu = () => setIsOpen(!isOpen);
