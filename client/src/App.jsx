@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -7,11 +12,10 @@ import Franchise from "./pages/Franchise";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
 import AdminLogin from "./pages/AdminLogin";
-import AlreadyLoggedInRoute from "./components/AlreadyLoggedInRoute";
 
 function App() {
   return (
-    <Router>
+    <>
       <Navbar />
       <div className="flex-grow">
         <Routes>
@@ -20,21 +24,12 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/franchise" element={<Franchise />} />
           <Route path="/contact" element={<Contact />} />
-          
-          <Route
-            path="/admin/login"
-            element={
-              <AlreadyLoggedInRoute>
-                <AdminLogin />
-              </AlreadyLoggedInRoute>
-            }
-          />
+          <Route path="/admin/login/*" element={<AdminLogin />} />
         </Routes>
       </div>
       <Footer />
-    </Router>
+    </>
   );
 }
 
 export default App;
-

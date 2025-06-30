@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import API from "../api";
+import { useUser, useAuth } from "@clerk/clerk-react";
 
 const Menu = () => {
   const [items, setItems] = useState([]);
@@ -7,7 +8,7 @@ const Menu = () => {
     name: "",
     description: "",
     price: "",
-    category: "Tea", // Default
+    category: "Tea",
     image: null,
   });
 
@@ -15,11 +16,19 @@ const Menu = () => {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const { isSignedIn } = useUser();
+  const { getToken } = useAuth();
 
-  const token = localStorage.getItem("token");
-  const isAdmin = !!token;
+  const isAdmin = isSignedIn;
 
-  const categories = ["all", "Tea", "Healthy Tea", "Coolers", "Juices", "Snacks"];
+  const categories = [
+    "all",
+    "Tea",
+    "Healthy Tea",
+    "Coolers",
+    "Juices",
+    "Snacks",
+  ];
 
   const fetchMenu = async () => {
     setLoading(true);
@@ -38,7 +47,9 @@ const Menu = () => {
   }, []);
 
   const handleDelete = async (id) => {
+    const token = await getToken();
     if (!token) return alert("Unauthorized");
+
     if (window.confirm("Are you sure you want to delete this item?")) {
       setLoading(true);
       try {
@@ -60,7 +71,6 @@ const Menu = () => {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  // Fixed handleEdit function
   const handleEdit = (item) => {
     setEditId(item._id);
     setForm({
@@ -68,7 +78,7 @@ const Menu = () => {
       description: item.description,
       price: item.price,
       image: null,
-      category: item.category || "Tea", // fallback
+      category: item.category || "Tea",
     });
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -76,6 +86,7 @@ const Menu = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const token = await getToken();
     if (!token) return alert("Unauthorized");
 
     setLoading(true);
@@ -98,7 +109,13 @@ const Menu = () => {
         alert("Item added successfully!");
       }
       setEditId(null);
-      setForm({ name: "", description: "", price: "", category: "Tea", image: null });
+      setForm({
+        name: "",
+        description: "",
+        price: "",
+        category: "Tea",
+        image: null,
+      });
       setShowForm(false);
       fetchMenu();
     } catch (err) {
@@ -108,7 +125,6 @@ const Menu = () => {
     }
   };
 
-  // Group items by category (only show categories that have items)
   const groupedItems = items.reduce((acc, item) => {
     const category = item.category || "Other";
     if (!acc[category]) {
@@ -137,8 +153,6 @@ const Menu = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
-
-
         {/* Admin Controls */}
         {isAdmin && (
           <div className="mb-12">
@@ -307,7 +321,8 @@ const Menu = () => {
                   </div>
                   <div className="text-center mt-2">
                     <span className="text-emerald-600 font-medium">
-                      {categoryItems.length} item{categoryItems.length !== 1 ? 's' : ''}
+                      {categoryItems.length} item
+                      {categoryItems.length !== 1 ? "s" : ""}
                     </span>
                   </div>
                 </div>

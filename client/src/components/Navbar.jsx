@@ -1,13 +1,12 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import React, { useEffect, useState, useRef } from "react";
 import { Menu, X, LogOut } from "lucide-react";
+import { useUser, useClerk } from "@clerk/clerk-react";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  
-  const navigate = useNavigate();
   const location = useLocation();
+<<<<<<< HEAD
   const logoutTimerRef = useRef(null);
 
   const toggleMenu = () => setIsOpen(!isOpen);
@@ -142,17 +141,24 @@ const Navbar = () => {
     setIsOpen(false);
     
     // Navigate to home page
+=======
+  const { user, isLoaded } = useUser();
+  const { signOut } = useClerk();
+  const navigate = useNavigate();
+
+  const toggleMenu = () => setIsOpen(!isOpen);
+
+  // Show logout button if user is signed in
+  const isSignedIn = isLoaded && user;
+
+  const handleLogout = async () => {
+    await signOut();
+>>>>>>> cb58ec3 (Updated project: removed Firebase & JWT, added Clerk auth)
     navigate("/");
-    
-    // Force reload the page to ensure all components update
-    setTimeout(() => {
-      window.location.reload();
-    }, 100);
+    setTimeout(() => window.location.reload(), 200);
   };
 
-  const isActiveRoute = (path) => {
-    return location.pathname === path;
-  };
+  const isActiveRoute = (path) => location.pathname === path;
 
   return (
     <nav className="bg-white shadow-lg sticky top-0 z-50 border-b-2 border-amber-100">
@@ -199,7 +205,7 @@ const Navbar = () => {
               </Link>
             ))}
 
-            {isAdmin && (
+            {isSignedIn && (
               <button
                 onClick={handleLogout}
                 className="relative ml-4 px-4 py-2 text-red-600 border-2 border-red-200 rounded-full font-medium transition-all duration-300 group overflow-hidden hover:border-red-400 hover:text-red-700"
@@ -346,7 +352,7 @@ const Navbar = () => {
                 </Link>
               ))}
 
-              {isAdmin && (
+              {isSignedIn && (
                 <button
                   onClick={handleLogout}
                   className="w-full p-3 mt-4 text-red-600 bg-red-50 border border-red-200 rounded-xl font-semibold transition-all duration-300 hover:bg-red-100 hover:border-red-300 group active:scale-98"

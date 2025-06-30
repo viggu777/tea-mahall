@@ -14,7 +14,6 @@ const app = express();
 //   })
 // );
 
-
 app.use(express.json());
 
 const menuRoutes = require("./routes/menuRoutes");
@@ -22,9 +21,6 @@ app.use("/api/menu", menuRoutes);
 
 const franchiseRoutes = require("./routes/franchiseRoutes");
 app.use("/api/franchise", franchiseRoutes);
-
-const adminAuthRoutes = require("./routes/adminAuthRoutes");
-app.use("/api/admin", adminAuthRoutes);
 
 // Routes
 app.get("/", (req, res) => {

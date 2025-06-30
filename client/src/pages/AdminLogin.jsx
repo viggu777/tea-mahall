@@ -1,61 +1,70 @@
-import React, { useState } from "react";
-import API from "../api";
-import { useNavigate } from "react-router-dom";
+// src/pages/AdminLogin.jsx
+import React from "react";
+import { SignIn } from "@clerk/clerk-react";
 
 const AdminLogin = () => {
-  const [credentials, setCredentials] = useState({
-    identifier: "", // username or email
-    password: "",
-  });
-  const navigate = useNavigate();
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await API.post("/api/admin/login", credentials);
-      localStorage.setItem("token", res.data.token);
-      navigate("/menu");
-    } catch (err) {
-      alert("Invalid login. Please check your credentials.");
-    }
-  };
-
   return (
-    <div className="flex items-center justify-center min-h-screen bg-green-50">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded shadow-md w-full max-w-sm"
-      >
-        <h2 className="text-2xl font-bold text-center text-green-700 mb-6">
-          Admin Login
-        </h2>
-        <input
-          type="text"
-          name="identifier"
-          placeholder="Email or Username"
-          value={credentials.identifier}
-          onChange={(e) =>
-            setCredentials({ ...credentials, identifier: e.target.value })
-          }
-          className="w-full mb-4 px-4 py-2 border rounded"
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={credentials.password}
-          onChange={(e) =>
-            setCredentials({ ...credentials, password: e.target.value })
-          }
-          className="w-full mb-4 px-4 py-2 border rounded"
-        />
-        <button
-          type="submit"
-          className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
-        >
-          Login
-        </button>
-      </form>
+    <div className="min-h-screen bg-white">
+      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full">
+          <SignIn
+            path="/admin/login"
+            routing="path"
+            signUpUrl="/admin/login"
+            redirectUrl="/menu"
+            afterSignInUrl="/menu"
+            appearance={{
+              elements: {
+                card: {
+                  boxShadow: "none",
+                  border: "none",
+                  backgroundColor: "transparent",
+                },
+                footer: { display: "none" },
+                formButtonPrimary: {
+                  backgroundColor: "#ea580c",
+                  fontSize: "16px",
+                  padding: "12px",
+                  borderRadius: "8px",
+                  "&:hover": {
+                    backgroundColor: "#dc2626",
+                  },
+                },
+                formFieldInput: {
+                  borderColor: "#d1d5db",
+                  borderRadius: "8px",
+                  padding: "12px",
+                  fontSize: "16px",
+                  "&:focus": {
+                    borderColor: "#ea580c",
+                    boxShadow: "0 0 0 3px rgba(234, 88, 12, 0.1)",
+                  },
+                },
+                formFieldLabel: {
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  color: "#374151",
+                },
+                socialButtonsBlockButton: {
+                  backgroundColor: "white",
+                  border: "1px solid #d1d5db",
+                  borderRadius: "8px",
+                  padding: "12px",
+                  fontSize: "16px",
+                  color: "#374151",
+                  "&:hover": {
+                    backgroundColor: "#f9fafb",
+                    borderColor: "#9ca3af",
+                  },
+                },
+              },
+            }}
+          />
+          <a href="/" className="text-gray-600 hover:text-orange-600">
+            ← Back to Home
+          </a>
+        </div>
+      </div>
     </div>
   );
 };

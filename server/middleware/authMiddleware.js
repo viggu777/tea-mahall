@@ -1,8 +1,8 @@
-const jwt = require("jsonwebtoken");
+const { verifyToken } = require("@clerk/backend");
+require("dotenv").config();
 
-const authenticateAdmin = (req, res, next) => {
+const authenticateAdmin = async (req, res, next) => {
   const authHeader = req.headers.authorization;
-  console.log("Authorization Header:", req.headers.authorization);
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({ message: "Unauthorized" });
   }
@@ -10,11 +10,15 @@ const authenticateAdmin = (req, res, next) => {
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET); // 👈 must match
-    req.admin = decoded; // attach admin to request
+    const { payload } = await verifyToken(token, {
+      apiKey: process.env.CLERK_SECRET_KEY, // ✅ Required
+    });
+
+    req.user = payload; // Attach to request
     next();
   } catch (err) {
-    return res.status(401).json({ message: "Invalid token" });
+    console.error("Clerk token verification failed:", err);
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
 };
 
