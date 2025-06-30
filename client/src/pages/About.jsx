@@ -118,7 +118,7 @@ const About = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
-              About Tea Mahal
+              About Tea Mahall
             </h1>
             <p className="text-xl md:text-2xl mb-8 max-w-4xl mx-auto leading-relaxed">
               From a single outlet in Rajahmundry to a growing tea movement
@@ -184,7 +184,7 @@ const About = () => {
               </h2>
               <div className="space-y-6 text-lg text-gray-700 leading-relaxed">
                 <p>
-                  Tea Mahal began with a simple yet powerful vision: to serve
+                  Tea Mahall began with a simple yet powerful vision: to serve
                   authentic, hygienic, and affordable tea that resonates with
                   Indian hearts. Our founder, driven by passion and a deep
                   understanding of local tastes, started this journey from the
@@ -218,7 +218,7 @@ const About = () => {
                     Our Mission
                   </h3>
                   <p className="text-gray-700 leading-relaxed">
-                    To make Tea Mahal the most loved and trusted tea brand in
+                    To make Tea Mahall the most loved and trusted tea brand in
                     India, creating opportunities for entrepreneurs while
                     serving happiness in every cup.
                   </p>
@@ -469,7 +469,7 @@ const About = () => {
               Join a movement that blends business with heart.
               <br />
               <span className="text-yellow-300">
-                Be part of the Tea Mahal revolution!
+                Be part of the Tea Mahall revolution!
               </span>
             </p>
             <button className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-full font-bold text-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
