@@ -7,12 +7,12 @@ require("dotenv").config();
 const app = express();
 
 // Middleware
-// app.use(
-//   cors({
-//     origin: ["http://localhost:5173", "https://teamahall.netlify.app"], // ✅ Allow both dev and production
-//     credentials: true,
-//   })
-// );
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "https://teamahall.netlify.app"], // ✅ Allow both dev and production
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 
