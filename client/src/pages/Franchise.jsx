@@ -219,7 +219,7 @@ const Franchise = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
-              Tea Mahal
+              Tea Mahall
             </h1>
             <h2 className="text-2xl md:text-4xl font-semibold mb-6">
               Become a Franchise Partner
@@ -452,7 +452,7 @@ const Franchise = () => {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h3 className="text-4xl md:text-5xl font-bold text-green-900 mb-6">
-              Start Your Tea Mahal Journey
+              Start Your Tea Mahall Journey
             </h3>
             <p className="text-xl text-gray-600">
               Fill out the form below and we'll get back to you within 24 hours
@@ -615,11 +615,11 @@ const Franchise = () => {
             </div>
             <div className="flex items-center space-x-2">
               <Mail className="w-6 h-6 text-yellow-400" />
-              <span className="text-xl">franchise@teamahal.com</span>
+              <span className="text-xl">franchise@teamahall.com</span>
             </div>
           </div>
           <p className="mt-6 text-lg opacity-90">
-            Join the Tea Mahal family and brew success in your city!
+            Join the Tea Mahall family and brew success in your city!
           </p>
         </div>
       </motion.section>
