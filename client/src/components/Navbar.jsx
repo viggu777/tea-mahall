@@ -1,147 +1,11 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { Menu, X, LogOut } from "lucide-react";
 import { useUser, useClerk } from "@clerk/clerk-react";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-
-  const logoutTimerRef = useRef(null);
-
-  const toggleMenu = () => setIsOpen(!isOpen);
-
-  // Handle page visibility changes and beforeunload
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      // Set a timer to logout after 1 minute when user leaves the site
-      // This will only work if the user actually closes the tab/browser
-      // For tab switching, we'll handle it in visibility change
-      logoutTimerRef.current = setTimeout(() => {
-        clearAllTokens();
-        setIsAdmin(false);
-      }, 60000); // 1 minute delay
-    };
-
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        // User switched tabs or minimized window - start logout timer
-        logoutTimerRef.current = setTimeout(() => {
-          clearAllTokens();
-          setIsAdmin(false);
-        }, 60000); // 1 minute delay
-      } else {
-        // User came back to the tab - cancel logout timer
-        if (logoutTimerRef.current) {
-          clearTimeout(logoutTimerRef.current);
-          logoutTimerRef.current = null;
-        }
-        // Re-check admin status when user returns
-        checkAdminStatus();
-      }
-    };
-
-    const handlePageShow = (event) => {
-      // Cancel any pending logout when page is shown
-      if (logoutTimerRef.current) {
-        clearTimeout(logoutTimerRef.current);
-        logoutTimerRef.current = null;
-      }
-      // Re-check admin status
-      checkAdminStatus();
-    };
-
-    // Add event listeners
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    window.addEventListener('pageshow', handlePageShow);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    // Cleanup event listeners and timer
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      window.removeEventListener('pageshow', handlePageShow);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      
-      // Clear any pending logout timer
-      if (logoutTimerRef.current) {
-        clearTimeout(logoutTimerRef.current);
-        logoutTimerRef.current = null;
-      }
-    };
-  }, []);
-
-  // Check login status on component mount and route changes
-  useEffect(() => {
-    checkAdminStatus();
-  }, [location.pathname]);
-
-  const clearAllTokens = () => {
-    // Clear all possible token locations
-    if (typeof Storage !== 'undefined') {
-      if (localStorage?.removeItem) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("admin_token");
-        localStorage.removeItem("authToken");
-        localStorage.removeItem("access_token");
-      }
-      if (sessionStorage?.removeItem) {
-        sessionStorage.removeItem("token");
-        sessionStorage.removeItem("admin_token");
-        sessionStorage.removeItem("authToken");
-        sessionStorage.removeItem("access_token");
-      }
-    }
-  };
-
-  const checkAdminStatus = () => {
-    // Check both localStorage and sessionStorage for various token names
-    const tokenChecks = [
-      localStorage?.getItem?.("token"),
-      localStorage?.getItem?.("admin_token"),
-      localStorage?.getItem?.("authToken"),
-      localStorage?.getItem?.("access_token"),
-      sessionStorage?.getItem?.("token"),
-      sessionStorage?.getItem?.("admin_token"),
-      sessionStorage?.getItem?.("authToken"),
-      sessionStorage?.getItem?.("access_token"),
-    ];
-
-    const token = tokenChecks.find((t) => t !== null && t !== undefined);
-    setIsAdmin(!!token);
-
-    // Debug logging - remove in production
-    console.log("=== Admin Token Debug ===");
-    console.log("localStorage token:", localStorage?.getItem?.("token"));
-    console.log(
-      "localStorage admin_token:",
-      localStorage?.getItem?.("admin_token")
-    );
-    console.log("sessionStorage token:", sessionStorage?.getItem?.("token"));
-    console.log(
-      "sessionStorage admin_token:",
-      sessionStorage?.getItem?.("admin_token")
-    );
-    console.log("Found token:", token ? "YES" : "NO");
-    console.log("isAdmin set to:", !!token);
-    console.log("========================");
-  };
-
-  const handleLogout = () => {
-    // Clear any pending logout timer
-    if (logoutTimerRef.current) {
-      clearTimeout(logoutTimerRef.current);
-      logoutTimerRef.current = null;
-    }
-    
-    // Clear all tokens
-    clearAllTokens();
-    setIsAdmin(false);
-    
-    // Close mobile menu if open
-    setIsOpen(false);
-    
-    // Navigate to home page
-=======
   const { user, isLoaded } = useUser();
   const { signOut } = useClerk();
   const navigate = useNavigate();
@@ -153,7 +17,6 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     await signOut();
->>>>>>> cb58ec3 (Updated project: removed Firebase & JWT, added Clerk auth)
     navigate("/");
     setTimeout(() => window.location.reload(), 200);
   };
